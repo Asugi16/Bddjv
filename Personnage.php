@@ -4,7 +4,7 @@ class Personnage
   private $_degats,
           $_id,
           $_nom,
-          $_experience,
+          $_experience = 0,
           $_niveau,
           $_superforce = 0;
   
