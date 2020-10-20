@@ -10,15 +10,15 @@ class PersonnagesManager
   
   public function add(Personnage $perso)
   {
-    $request = $this->_db->prepare('INSERT INTO personnages(nom) VALUES(:nom)');
+    $request = $this->_db->prepare('INSERT INTO personnages(nom, nature) VALUES(:nom, :nature)');
     $request->bindValue(':nom', $perso->nom());
+    $request->bindValue(':nature', $perso->nature());
     $request->execute();
     
     $perso->hydrate([
       'id' => $this->_db->lastInsertId(),
       'degats' => 0,
-      'atout' => 0,
-    ]);
+      'atout' => 0]);
   }
   
   public function count()
@@ -50,7 +50,10 @@ class PersonnagesManager
     {
       $request = $this->_db->query('SELECT id, nom, degats, tempsdodo, nature, atout FROM personnages WHERE id = '.$info);
       $donnees = $request->fetch(PDO::FETCH_ASSOC);
-
+    }else {
+      $request = $this->_db->query('SELECT id, nom, degats, tempsdodo, nature, atout FROM personnages WHERE nom ="'.$info . '"');
+      $donnees = $request->fetch(PDO::FETCH_ASSOC);
+    }
       switch ($donnees['nature'])
       {
         case "guerrier": return new Guerrier ($donnees); break;
@@ -59,7 +62,6 @@ class PersonnagesManager
         default: return null;
       }
     }
-  }
   
   public function getList($nom)
   {

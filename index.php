@@ -27,7 +27,7 @@ if (isset($_SESSION['perso'])) // Si la session perso existe, on restaure l'obje
 
 if (isset($_POST['creer']) && isset($_POST['nom'])) // Si on a voulu créer un personnage.
 {
-  switch ($_POST['type']) {
+  switch ($_POST['nature']) {
     case 'magicien':
       $perso = new Magicien(['nom' => $_POST['nom']]);
       break;
@@ -184,7 +184,7 @@ if (isset($_POST['creer']) && isset($_POST['nom'])) // Si on a voulu créer un p
                             echo 'Un magicien vous a endormi ! Vous allez vous réveiller dans ' . $perso->reveil() ; '.';
                         } else {
                             foreach($persos as $unPerso){
-                                echo '<a href="?frapper='.$unPerso->id().'">'.htmlspecialchars($unPerso->nom()).'</a> (dégâts : '.$unPerso->degats().' | type : ' . $unPerso -> nature().')';
+                                echo '<a href="?frapper='.$unPerso->id().'">'.htmlspecialchars($unPerso->nom()).'</a> (dégâts : '.$unPerso->degats().' | nature : ' . $unPerso -> nature().')';
                                  
                                 if ($perso -> nature() == 'magicien')
                                 {
@@ -211,7 +211,7 @@ if (isset($_POST['creer']) && isset($_POST['nom'])) // Si on a voulu créer un p
                     Nom : <input type="text" name="nom" maxlength="50" />
                     <input type="submit" value = "Utiliser ce personnage" name="utiliser" /><br />
                      
-                    nature : <select name="type">
+                    nature : <select name="nature">
                         <option value="magicien">Magicien</option>
                         <option value="guerrier">Guerrier</option>
                     </select>
