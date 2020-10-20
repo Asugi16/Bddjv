@@ -1,38 +1,58 @@
 <?php
-class Personnage
+
+abstract class Personnage
 {
-  private $_degats,
+  protected $_degats,
           $_id,
           $_nom,
           $_experience = 0,
           $_niveau,
-          $_superforce = 0;
+          $_tempsdodo,
+          $_nature,
+          $_atout;
   
   const CEST_MOI = 1; 
   const PERSONNAGE_TUE = 2; 
   const PERSONNAGE_FRAPPE = 3; 
-  const PERSONNAGE_PREND_EXPERIENCE = 4;
-  const PERSONNAGE_LVL_UP = 5;
-  const PERSONNAGE_PREND_FORCE = 6;
+  const PERSONNAGE_ENSORCELE = 4;
+  const PAS_DE_MAGIE = 5;
+  const PERSO_ENDORMI = 6;
   
   
   public function __construct(array $donnees)
   {
     $this->hydrate($donnees);
+    $this->_nature = strtolower(static::class);
   }
   
+  public function estEndormi()
+  {
+    return $this->_tempsdodo > time();
+  }
+
   public function frapper(Personnage $perso)
   {
-    $this->_experience +=5;
-    $superforce = $this->_superforce;
-
-    if ($perso->id() == $this->_id)
-    {
-      return self::CEST_MOI;
-    }
-    return $perso->recevoirDegats($superforce);
+      if ($this->id() == $perso->id()){
+          return self::CEST_MOI;
+      }
+       
+      if ($this->estEndormi()){
+          return self::PERSO_ENDORMI;
+      }
+       
+      return $perso->recevoirDegats();
   }
   
+  public function recevoirDegats($degats)
+  {
+      $this->setDegats($this->degats() + $degats);
+       
+      if ($this->degats() >= 100){
+          return self::PERSONNAGE_TUE;
+      }
+      return self::PERSONNAGE_FRAPPE;
+  }
+
   public function hydrate(array $donnees)
   {
     foreach ($donnees as $key => $value)
@@ -45,47 +65,23 @@ class Personnage
       }
     }
   }
-  
-  public function recevoirDegats($superforce)
-  {
-    $this->_degats += 5 + $superforce;
-  
-    if ($this->_degats >= 100)
-    {
-      return self::PERSONNAGE_TUE;
-    }
-    
-      return self::PERSONNAGE_FRAPPE;
+
+  public function reveil(){
+    $secondes = $this->tempsDodo();
+    $secondes -= time();
+
+    $heures = floor($secondes / 3600);
+    $secondes -= $heures * 3600;
+    $minutes = floor($secondes / 60);
+    $secondes -= $minutes * 60;
+
+    $heures .= $heures <= 1 ? ' heure' : ' heures';
+    $minutes .= $minutes <= 1 ? ' minute' : ' minutes';
+    $secondes .= $secondes <= 1 ? ' seconde' : ' secondes';
+
+    return $heures . ', ' . $minutes . ' et ' . $secondes;
   }
 
-  public function recevoirExperience()
-  {
-    $this->_experience += 10;
-
-    if ($this->_experience <=100)
-    {
-      return self::PERSONNAGE_PREND_EXPERIENCE;
-    }
-  }
-  public function recevoirSuperForce()
-  {
-    if ($this->_superforce <=28)
-    $this->_superforce +=2;
-  {
-    return self::PERSONNAGE_PREND_FORCE;
-  }
-  }
-  
-  public function prendreNiveau(){
-
-    if ($this->_experience == 100)
-    {
-      $this->_niveau +=1;
-      $this->_experience = 0;
-
-      return self::PERSONNAGE_LVL_UP;   
-    }
-  }
   public function degats()
   {
     return $this->_degats;
@@ -100,20 +96,19 @@ class Personnage
   {
     return $this->_nom;
   }
-  
-  public function experience()
+
+  public function atout()
   {
-    return $this->_experience;
+    return $this->_atout;
   }
 
-  public function niveau()
+  public function tempsDodo()
   {
-    return $this->_niveau;
+    return $this->_tempsdodo;
   }
-
-  public function superForce()
+  public function nature()
   {
-    return $this->_superforce;
+    return $this->_nature;
   }
 
   public function setDegats($degats)
@@ -144,35 +139,23 @@ class Personnage
     }
   }
 
-  public function setExperience($experience)
-  {
-    $experience = (int) $experience;
+public function setAtout($atout)
+{
+  $atout = (int) $atout;
+    if ($atout >= 0 && $atout <= 100)
+      {
+        $this->_atout = $atout;
+      }
+}
 
-    if ($experience >=0 && $experience <=100)
-    {
-      $this->_experience = $experience;
-    }
-  }
-
-  public function setNiveau($niveau)
-  {
-    $niveau = (int) $niveau;
-
-    if ($niveau >=1 && $niveau <=50)
-    {
-      $this->_niveau = $niveau;
-    }
-  }
-
-  public function setForce($superforce)
-  {
-    $superforce = (int) $superforce;
-
-    if ($superforce >=0 && $superforce <=28)
-    {
-      $this->_superforce = $superforce;
-    }
-  }
+public function setTempsDodo($tempsdodo)
+{
+  $tempsdodo= (int) $tempsdodo;
+    if ($tempsdodo>= 0)
+      {
+        $this->_tempsdodo = $tempsdodo;
+      }
+}
 
 public function nomValide()
 {
